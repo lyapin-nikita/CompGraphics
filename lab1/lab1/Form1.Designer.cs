@@ -36,6 +36,9 @@
             точечныеToolStripMenuItem = new ToolStripMenuItem();
             инверсияToolStripMenuItem = new ToolStripMenuItem();
             матричныеToolStripMenuItem = new ToolStripMenuItem();
+            backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            progressBar2 = new ProgressBar();
+            button1 = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -100,11 +103,37 @@
             матричныеToolStripMenuItem.Size = new Size(139, 22);
             матричныеToolStripMenuItem.Text = "Матричные";
             // 
+            // backgroundWorker1
+            // 
+            backgroundWorker1.WorkerReportsProgress = true;
+            backgroundWorker1.WorkerSupportsCancellation = true;
+            backgroundWorker1.DoWork += backgroundWorker1_DoWork;
+            backgroundWorker1.ProgressChanged += backgroundWorker1_ProgressChanged;
+            // 
+            // progressBar2
+            // 
+            progressBar2.Location = new Point(31, 506);
+            progressBar2.Name = "progressBar2";
+            progressBar2.Size = new Size(747, 23);
+            progressBar2.TabIndex = 3;
+            // 
+            // button1
+            // 
+            button1.Location = new Point(784, 506);
+            button1.Name = "button1";
+            button1.Size = new Size(75, 23);
+            button1.TabIndex = 4;
+            button1.Text = "Отмена";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1441, 718);
+            Controls.Add(button1);
+            Controls.Add(progressBar2);
             Controls.Add(pictureBox1);
             Controls.Add(menuStrip1);
             MainMenuStrip = menuStrip1;
@@ -127,5 +156,8 @@
         private ToolStripMenuItem точечныеToolStripMenuItem;
         private ToolStripMenuItem инверсияToolStripMenuItem;
         private ToolStripMenuItem матричныеToolStripMenuItem;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private ProgressBar progressBar2;
+        private Button button1;
     }
 }
