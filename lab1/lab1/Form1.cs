@@ -23,14 +23,14 @@ namespace lab1
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.Filter = "Image files | *.png; *.jpg; *.bmp | All Files (*.*) | *.*";
 
+
+            //проверка на корректную загрузку
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 image = new Bitmap(dialog.FileName);
                 pictureBox1.Image = image;
                 pictureBox1.Refresh();
             }
-            ;
-
 
         }
 
@@ -42,9 +42,17 @@ namespace lab1
         {
             InvertFilter filter = new InvertFilter();
             backgroundWorker1.RunWorkerAsync(filter);
-            //Bitmap res = filter.processImage(image);
-            //pictureBox1.Image = res;
-            //pictureBox1.Refresh();
+        }
+
+        private void размытиеToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new BlurFilter();
+            backgroundWorker1.RunWorkerAsync(filter);
+        }
+        private void размытие√ауссаToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new GaussianFilter();
+            backgroundWorker1.RunWorkerAsync(filter);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -63,8 +71,13 @@ namespace lab1
             Filters filter = (Filters)e.Argument;
             Bitmap resultImage = filter.processImage(image, backgroundWorker1);
 
-            if (backgroundWorker1.CancellationPending != true)
-                image = resultImage;
+            if (backgroundWorker1.CancellationPending)
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            image = resultImage;
 
 
         }
@@ -77,7 +90,7 @@ namespace lab1
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if(!e.Cancelled)
+            if (!e.Cancelled)
             {
                 pictureBox1.Image = image;
                 pictureBox1.Refresh();
