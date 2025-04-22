@@ -32,20 +32,18 @@ namespace lab1
         }
 
 
-        public Bitmap processImage(Bitmap sourceImage, BackgroundWorker worker)
+        public Bitmap processImage(Bitmap sourceImage)
         {
             Bitmap resultImage = new Bitmap(sourceImage.Width, sourceImage.Height);
 
             for (int i = 0; i < sourceImage.Width; i++)
             {
-                worker.ReportProgress((int)((float)i / resultImage.Width * 100));
-                if (worker.CancellationPending) return null;
+
                 for (int j = 0; j < sourceImage.Height; j++)
                 {
                     resultImage.SetPixel(i, j, calculateNewPixel(sourceImage, i, j));
                 }
             }
-            worker.ReportProgress(100);
             return resultImage;
         }
 
@@ -174,6 +172,41 @@ namespace lab1
         }
     }
 
+
+
+    class GrayScaleFilter : Filters
+    {
+        
+        protected override Color calculateNewPixel(Bitmap sourceImage, int x, int y)
+        {
+            Color sourceColor = sourceImage.GetPixel(x, y);
+            float intensity = 0.36f * sourceColor.R + 0.53f * sourceColor.G + 0.11f * sourceColor.B;
+            Color resultColor = Color.FromArgb((int)intensity, (int)intensity, (int)intensity);
+
+            return resultColor;
+        }
+
+    }
+
+
+
+    class SepiaFilter : Filters
+    {
+
+
+        protected override Color calculateNewPixel(Bitmap sourceImage, int x, int y)
+        {
+            Color sourceColor = sourceImage.GetPixel(x, y);
+            float intensity = 0.36f * sourceColor.R + 0.53f * sourceColor.G + 0.11f * sourceColor.B;
+            float k = 40f;
+            int rColor = Clamp((int)(intensity + 2f * k), 0, 255);
+            int gColor = Clamp((int)(intensity + 0.5f * k), 0, 255);
+            int bColor = Clamp((int)(intensity - 1f * k), 0, 255);
+            Color resultColor = Color.FromArgb(rColor, gColor, bColor);
+
+            return resultColor;
+        }
+    }
 
 
 

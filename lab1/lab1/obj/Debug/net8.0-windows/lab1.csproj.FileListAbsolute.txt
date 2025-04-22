@@ -31,3 +31,4 @@ C:\Users\nikitoschillguy2004\Documents\GitHub\CompGraphics\lab1\lab1\obj\Debug\n
 C:\Users\nikitoschillguy2004\Documents\GitHub\CompGraphics\lab1\lab1\obj\Debug\net8.0-windows\lab1.pdb
 C:\Users\nikitoschillguy2004\Documents\GitHub\CompGraphics\lab1\lab1\obj\Debug\net8.0-windows\lab1.genruntimeconfig.cache
 C:\Users\nikitoschillguy2004\Documents\GitHub\CompGraphics\lab1\lab1\obj\Debug\net8.0-windows\ref\lab1.dll
+C:\Users\nikitoschillguy2004\Documents\GitHub\CompGraphics\lab1\lab1\obj\Debug\net8.0-windows\lab1.Properties.Resources.resources

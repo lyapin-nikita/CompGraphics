@@ -40,62 +40,51 @@ namespace lab1
 
         private void èíâåðñèÿToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            InvertFilter filter = new InvertFilter();
-            backgroundWorker1.RunWorkerAsync(filter);
+            Filters filter = new InvertFilter();
+            Bitmap res = filter.processImage(image);
+            pictureBox1.Image = res;
+            pictureBox1.Refresh();
+        }
+
+        private void ÷åðíîåáåëîåToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new GrayScaleFilter();
+            Bitmap res = filter.processImage(image);
+            pictureBox1.Image = res;
+            pictureBox1.Refresh();
+        }
+
+        private void ñåïèÿToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new SepiaFilter();
+            Bitmap res = filter.processImage(image);
+            pictureBox1.Image = res;
+            pictureBox1.Refresh();
         }
 
         private void ðàçìûòèåToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Filters filter = new BlurFilter();
-            backgroundWorker1.RunWorkerAsync(filter);
+            Bitmap res = filter.processImage(image);
+            pictureBox1.Image = res;
+            pictureBox1.Refresh();
         }
         private void ðàçìûòèåÃàóññàToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Filters filter = new GaussianFilter();
-            backgroundWorker1.RunWorkerAsync(filter);
+            Bitmap res = filter.processImage(image);
+            pictureBox1.Image = res;
+            pictureBox1.Refresh();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            backgroundWorker1.CancelAsync();
-        }
-
-
-
-
-
-
-        //backgroundworker1
-        private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
-        {
-            Filters filter = (Filters)e.Argument;
-            Bitmap resultImage = filter.processImage(image, backgroundWorker1);
-
-            if (backgroundWorker1.CancellationPending)
-            {
-                e.Cancel = true;
-                return;
-            }
-
-            image = resultImage;
-
 
         }
 
-        private void backgroundWorker1_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
+        private void Form1_Load(object sender, EventArgs e)
         {
-            progressBar2.Value = e.ProgressPercentage;
-        }
 
-
-        private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (!e.Cancelled)
-            {
-                pictureBox1.Image = image;
-                pictureBox1.Refresh();
-            }
-            progressBar2.Value = 0;
         }
 
     }

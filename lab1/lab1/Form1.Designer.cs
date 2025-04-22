@@ -35,11 +35,10 @@
             фильтрыToolStripMenuItem = new ToolStripMenuItem();
             точечныеToolStripMenuItem = new ToolStripMenuItem();
             инверсияToolStripMenuItem = new ToolStripMenuItem();
+            черноебелоеToolStripMenuItem = new ToolStripMenuItem();
+            сепияToolStripMenuItem = new ToolStripMenuItem();
             матричныеToolStripMenuItem = new ToolStripMenuItem();
             размытиеToolStripMenuItem = new ToolStripMenuItem();
-            backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            progressBar2 = new ProgressBar();
-            button1 = new Button();
             размытиеГауссаToolStripMenuItem = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             menuStrip1.SuspendLayout();
@@ -49,7 +48,7 @@
             // 
             pictureBox1.Location = new Point(0, 27);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(1441, 690);
+            pictureBox1.Size = new Size(1441, 691);
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
             pictureBox1.Click += pictureBox1_Click;
@@ -62,6 +61,7 @@
             menuStrip1.Size = new Size(1441, 24);
             menuStrip1.TabIndex = 1;
             menuStrip1.Text = "menuStrip1";
+            menuStrip1.ItemClicked += menuStrip1_ItemClicked;
             // 
             // файлToolStripMenuItem
             // 
@@ -86,60 +86,50 @@
             // 
             // точечныеToolStripMenuItem
             // 
-            точечныеToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { инверсияToolStripMenuItem });
+            точечныеToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { инверсияToolStripMenuItem, черноебелоеToolStripMenuItem, сепияToolStripMenuItem });
             точечныеToolStripMenuItem.Name = "точечныеToolStripMenuItem";
-            точечныеToolStripMenuItem.Size = new Size(180, 22);
+            точечныеToolStripMenuItem.Size = new Size(139, 22);
             точечныеToolStripMenuItem.Text = "Точечные";
             // 
             // инверсияToolStripMenuItem
             // 
             инверсияToolStripMenuItem.Name = "инверсияToolStripMenuItem";
-            инверсияToolStripMenuItem.Size = new Size(128, 22);
+            инверсияToolStripMenuItem.Size = new Size(153, 22);
             инверсияToolStripMenuItem.Text = "Инверсия";
             инверсияToolStripMenuItem.Click += инверсияToolStripMenuItem_Click;
+            // 
+            // черноебелоеToolStripMenuItem
+            // 
+            черноебелоеToolStripMenuItem.Name = "черноебелоеToolStripMenuItem";
+            черноебелоеToolStripMenuItem.Size = new Size(153, 22);
+            черноебелоеToolStripMenuItem.Text = "Черное-белое";
+            черноебелоеToolStripMenuItem.Click += черноебелоеToolStripMenuItem_Click;
+            // 
+            // сепияToolStripMenuItem
+            // 
+            сепияToolStripMenuItem.Name = "сепияToolStripMenuItem";
+            сепияToolStripMenuItem.Size = new Size(153, 22);
+            сепияToolStripMenuItem.Text = "Сепия";
+            сепияToolStripMenuItem.Click += сепияToolStripMenuItem_Click;
             // 
             // матричныеToolStripMenuItem
             // 
             матричныеToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { размытиеToolStripMenuItem, размытиеГауссаToolStripMenuItem });
             матричныеToolStripMenuItem.Name = "матричныеToolStripMenuItem";
-            матричныеToolStripMenuItem.Size = new Size(180, 22);
+            матричныеToolStripMenuItem.Size = new Size(139, 22);
             матричныеToolStripMenuItem.Text = "Матричные";
             // 
             // размытиеToolStripMenuItem
             // 
             размытиеToolStripMenuItem.Name = "размытиеToolStripMenuItem";
-            размытиеToolStripMenuItem.Size = new Size(180, 22);
+            размытиеToolStripMenuItem.Size = new Size(167, 22);
             размытиеToolStripMenuItem.Text = "Размытие";
             размытиеToolStripMenuItem.Click += размытиеToolStripMenuItem_Click;
-            // 
-            // backgroundWorker1
-            // 
-            backgroundWorker1.WorkerReportsProgress = true;
-            backgroundWorker1.WorkerSupportsCancellation = true;
-            backgroundWorker1.DoWork += backgroundWorker1_DoWork;
-            backgroundWorker1.ProgressChanged += backgroundWorker1_ProgressChanged;
-            // 
-            // progressBar2
-            // 
-            progressBar2.Location = new Point(31, 506);
-            progressBar2.Name = "progressBar2";
-            progressBar2.Size = new Size(747, 23);
-            progressBar2.TabIndex = 3;
-            // 
-            // button1
-            // 
-            button1.Location = new Point(784, 506);
-            button1.Name = "button1";
-            button1.Size = new Size(75, 23);
-            button1.TabIndex = 4;
-            button1.Text = "Отмена";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
             // 
             // размытиеГауссаToolStripMenuItem
             // 
             размытиеГауссаToolStripMenuItem.Name = "размытиеГауссаToolStripMenuItem";
-            размытиеГауссаToolStripMenuItem.Size = new Size(180, 22);
+            размытиеГауссаToolStripMenuItem.Size = new Size(167, 22);
             размытиеГауссаToolStripMenuItem.Text = "Размытие Гаусса";
             размытиеГауссаToolStripMenuItem.Click += размытиеГауссаToolStripMenuItem_Click;
             // 
@@ -148,13 +138,12 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1441, 718);
-            Controls.Add(button1);
-            Controls.Add(progressBar2);
             Controls.Add(pictureBox1);
             Controls.Add(menuStrip1);
             MainMenuStrip = menuStrip1;
             Name = "Form1";
             Text = "Form1";
+            Load += Form1_Load;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
@@ -172,10 +161,9 @@
         private ToolStripMenuItem точечныеToolStripMenuItem;
         private ToolStripMenuItem инверсияToolStripMenuItem;
         private ToolStripMenuItem матричныеToolStripMenuItem;
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
-        private ProgressBar progressBar2;
-        private Button button1;
         private ToolStripMenuItem размытиеToolStripMenuItem;
         private ToolStripMenuItem размытиеГауссаToolStripMenuItem;
+        private ToolStripMenuItem черноебелоеToolStripMenuItem;
+        private ToolStripMenuItem сепияToolStripMenuItem;
     }
 }
