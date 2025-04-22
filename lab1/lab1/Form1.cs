@@ -76,6 +76,27 @@ namespace lab1
             pictureBox1.Image = res;
             pictureBox1.Refresh();
         }
+        private void ïîâûøåíèåßğêîñòèToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new BrightnessFilter();
+            Bitmap res = filter.processImage(image);
+            pictureBox1.Image = res;
+            pictureBox1.Refresh();
+        }
+        private void ôèëüòğÑîáåëÿToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new SobelFilter();
+            Bitmap res = filter.processImage(image);
+            pictureBox1.Image = res;
+            pictureBox1.Refresh();
+        }
+        private void ïîâûøåíèåĞåçêîñòèToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new SharpnessFilter();
+            Bitmap res = filter.processImage(image);
+            pictureBox1.Image = res;
+            pictureBox1.Refresh();
+        }
 
         private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
