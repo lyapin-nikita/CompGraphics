@@ -141,7 +141,7 @@ namespace lab1
     }
     class GrayScaleFilter : Filters
     {
-        
+
         protected override Color calculateNewPixel(Bitmap sourceImage, int x, int y)
         {
             Color sourceColor = sourceImage.GetPixel(x, y);
@@ -197,7 +197,7 @@ namespace lab1
     class GaussianFilter : MatrixFilter
     {
         public GaussianFilter() { createGaussianKernel(3, 2); }
-        
+
         public void createGaussianKernel(int rad, float sigma)
         {
             int size = 2 * rad + 1; //размер ядра
@@ -206,7 +206,7 @@ namespace lab1
 
             for (int i = -rad; i <= rad; i++)
             {
-                for(int j = -rad; j <= rad; j++)
+                for (int j = -rad; j <= rad; j++)
                 {
                     kernel[i + rad, j + rad] = (float)Math.Exp((-(i * i + j * j) / (sigma * sigma)));
                     norm += kernel[i + rad, j + rad];
@@ -214,13 +214,13 @@ namespace lab1
             }
 
             for (int i = 0; i < size; i++)
-            { 
-                for(int j = 0;j < size; j++)
+            {
+                for (int j = 0; j < size; j++)
                 {
                     kernel[i, j] /= norm;
                 }
             }
-            
+
 
         }
     }
@@ -313,5 +313,324 @@ namespace lab1
         }
     }
 
+
+    class EmbrossFilter : MatrixFilter
+    {
+
+
+
+        public EmbrossFilter()
+        {
+            kernel = new float[,]
+            {
+                { 0, 1, 0 },
+                { 1, 0, -1 },
+                { 0, -1, 0 }
+            };
+        }
+
+
+
+
+        protected override Color calculateNewPixel(Bitmap source, int x, int y)
+        {
+            int radX = kernel.GetLength(0) / 2;
+            int radY = kernel.GetLength(1) / 2;
+
+            float resR = 0;
+            float resG = 0;
+            float resB = 0;
+
+            for (int l = -radY; l <= radY; l++)
+            {
+                for (int h = -radX; h <= radX; h++)
+                {
+                    int idX = Clamp(x + h, 0, source.Width - 1);
+                    int idY = Clamp(y + l, 0, source.Height - 1);
+
+                    Color neiColor = source.GetPixel(idX, idY);
+
+
+
+                    resR += neiColor.R * kernel[h + radX, l + radY];
+                    resG += neiColor.G * kernel[h + radX, l + radY];
+                    resB += neiColor.B * kernel[h + radX, l + radY];
+
+                }
+
+            }
+
+
+            //сдвиг и нормировка
+            int intensity = ((int)(resR + resB + resG) / 3) + 128;
+            intensity = Clamp(intensity, 0, 255);
+
+
+
+            Color resultColor = Color.FromArgb(intensity, intensity, intensity);
+            return resultColor;
+
+        }
+
+
+    }
+
+
+
+    class MedianFilter : Filters
+    {
+        protected override Color calculateNewPixel(Bitmap source, int x, int y)
+        {
+            int radius = 1;
+
+
+            //реализация через list
+            List<int> rValues = new List<int>();
+            List<int> gValues = new List<int>();
+            List<int> bValues = new List<int>();
+
+            for (int l = -radius; l <= radius; l++)
+            {
+                for (int k = -radius; k <= radius; k++)
+                {
+                    int idX = Clamp(x + k, 0, source.Width - 1);
+                    int idY = Clamp(y + l, 0, source.Height - 1);
+                    Color pixel = source.GetPixel(idX, idY);
+
+                    rValues.Add(pixel.R);
+                    gValues.Add(pixel.G);
+                    bValues.Add(pixel.B);
+                }
+            }
+
+            rValues.Sort();
+            gValues.Sort();
+            bValues.Sort();
+
+
+
+            //вычисляем медиану по отсортированному списку
+            int medianIndex = rValues.Count / 2;
+            return Color.FromArgb
+            (
+                rValues[medianIndex],
+                gValues[medianIndex],
+                bValues[medianIndex]
+            );
+        }
+    }
+
+
+
+    class GlowingEdgesFilter : Filters
+    {
+
+        //TODO реализовать медианный фильтр
+        private MedianFilter medianFilter;
+        private SobelFilter sobelFilter;
+
+
+        public GlowingEdgesFilter()
+        {
+            medianFilter = new MedianFilter();
+            sobelFilter = new SobelFilter();
+        }
+
+
+
+        protected override Color calculateNewPixel(Bitmap source, int x, int y)
+        {
+            //сначала применяем медианный фильтр и оператор собеля
+            Bitmap resMedian = medianFilter.processImage(source);
+            Bitmap resSobel = sobelFilter.processImage(resMedian);
+            Color edgeColor = resSobel.GetPixel(x, y);
+
+
+            int intensity = (int)(edgeColor.R + edgeColor.B + edgeColor.G);
+            int upIntensity = (int)(intensity * 2);
+
+
+            Color resColor = Color.FromArgb
+                (
+                    Clamp(upIntensity, 0, 255),
+                    Clamp(upIntensity, 0, 255),
+                    Clamp(upIntensity, 0, 255)
+
+                );
+
+            return resColor;
+
+        }
+
+    }
+
+
+
+    class ShiftFilter : Filters
+    {
+        int shiftX = 0, shiftY = 0;
+
+        public ShiftFilter(int shiftX = 50, int shiftY = 0)
+        {
+            this.shiftX = shiftX;
+            this.shiftY = shiftY;
+        }
+
+
+        protected override Color calculateNewPixel(Bitmap source, int x, int y)
+        {
+            int newX = 0, newY = 0;
+            newX = x + shiftX;
+            newY = y + shiftY;
+
+            if (newX <= 0 || newX >= source.Width || newY <= 0 || newY >= source.Height)
+            {
+                return Color.Gray;
+            }
+
+
+            return source.GetPixel(newX, newY);
+        }
+
+
+
+
+
+    }
+
+
+
+
+
+
+    class RotateFilter : Filters
+    {
+        private PointF center;
+        private float angle;
+
+        public RotateFilter(PointF center, float angle)
+        {
+            this.center = center;
+            this.angle = angle * (float)(Math.PI / 180); // преобразуем градусы в радианы
+        }
+
+        protected override Color calculateNewPixel(Bitmap source, int x, int y)
+        {
+            // Переводим координаты в систему с началом в центре
+            float xRel = x - center.X;
+            float yRel = y - center.Y;
+
+            // Применяем матрицу поворота
+            float newX = xRel * (float)Math.Cos(angle) - yRel * (float)Math.Sin(angle);
+            float newY = xRel * (float)Math.Sin(angle) + yRel * (float)Math.Cos(angle);
+
+            // Переводим обратно в абсолютные координаты
+            newX += center.X;
+            newY += center.Y;
+
+            // Проверяем границы изображения
+            if (newX < 0 || newX >= source.Width || newY < 0 || newY >= source.Height)
+            {
+                return Color.Gray;
+            }
+
+            // Берем ближайший пиксель (без интерполяции)
+            return source.GetPixel((int)newX, (int)newY);
+        }
+    }
+
+
+    class GlassFilter : Filters
+    {
+        private int radius;
+        private Random random;
+
+        public GlassFilter(int radius = 10)
+        {
+            this.radius = radius;
+            this.random = new Random();
+        }
+
+        protected override Color calculateNewPixel(Bitmap source, int x, int y)
+        {
+            // Генерируем случайные смещения в пределах [-radius/2, radius/2]
+            int offsetX = (int)((random.NextDouble() - 0.5) * radius);
+            int offsetY = (int)((random.NextDouble() - 0.5) * radius);
+
+            // Вычисляем новые координаты с учетом смещения
+            int newX = Clamp(x + offsetX, 0, source.Width - 1);
+            int newY = Clamp(y + offsetY, 0, source.Height - 1);
+
+            // Возвращаем цвет пикселя из новых координат
+            return source.GetPixel(newX, newY);
+        }
+    }
+
+
+    class MotionBlurFilter : MatrixFilter
+    {
+        public MotionBlurFilter(int n = 5)
+        {
+            // Создаем квадратное ядро размером n x n
+            kernel = new float[n, n];
+
+            // Заполняем главную диагональ единицами
+            for (int i = 0; i < n; i++)
+            {
+                kernel[i, i] = 1.0f;
+            }
+
+            // Нормируем ядро (делим каждый элемент на n)
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    kernel[i, j] /= n;
+                }
+            }
+        }
+    }
+
+
+
+    class WaveFilter : Filters
+    {
+        public enum WaveType { Vertical, Horizontal }
+        private WaveType type;
+        private double amplitude;
+        private double period;
+
+        public WaveFilter(WaveType type = WaveType.Vertical,
+                         double amplitude = 20,
+                         double period = 60)
+        {
+            this.type = type;
+            this.amplitude = amplitude;
+            this.period = period;
+        }
+
+        protected override Color calculateNewPixel(Bitmap source, int k, int l)
+        {
+            double newX = k;
+            double newY = l;
+
+            // Применяем соответствующее волновое преобразование
+            switch (type)
+            {
+                case WaveType.Vertical:
+                    newX = k + amplitude * Math.Sin(2 * Math.PI * l / period);
+                    break;
+                case WaveType.Horizontal:
+                    newY = l + amplitude * Math.Sin(2 * Math.PI * k / (period / 2));
+                    break;
+            }
+
+            // Ограничиваем координаты размерами изображения
+            int x = Clamp((int)newX, 0, source.Width - 1);
+            int y = Clamp((int)newY, 0, source.Height - 1);
+
+            return source.GetPixel(x, y);
+        }
+    }
 
 }

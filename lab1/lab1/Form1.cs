@@ -97,6 +97,67 @@ namespace lab1
             pictureBox1.Image = res;
             pictureBox1.Refresh();
         }
+        private void òèñíåíèåToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new EmbrossFilter();
+            Bitmap res = filter.processImage(image);
+            pictureBox1.Image = res;
+            pictureBox1.Refresh();
+        }
+
+        private void ñâåòÿùèåñÿÊğàÿToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new GlowingEdgesFilter();
+            Bitmap res = filter.processImage(image);
+            pictureBox1.Image = res;
+            pictureBox1.Refresh();
+        }
+
+        private void ìåäèàííûéÔèëüòğToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new MedianFilter();
+            Bitmap res = filter.processImage(image);
+            pictureBox1.Image = res;
+            pictureBox1.Refresh();
+        }
+
+        private void ïåğåíîñToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new ShiftFilter(-100, 0);
+            Bitmap res = filter.processImage(image);
+            pictureBox1.Image = res;
+            pictureBox1.Refresh();
+        }
+
+        private void ïîâîğîòToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PointF sourceCenter = new PointF(image.Width / 2f, image.Height / 2f);
+            Filters filter = new RotateFilter(sourceCenter, 45); // Óãîë â ãğàäóñàõ
+            Bitmap res = filter.processImage(image);
+            pictureBox1.Image = res;
+            pictureBox1.Refresh();
+        }
+        private void ñòåêëîToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new GlassFilter();
+            Bitmap res = filter.processImage(image);
+            pictureBox1.Image = res;
+            pictureBox1.Refresh();
+        }
+        private void motionBlurToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new MotionBlurFilter(5);
+            Bitmap res = filter.processImage(image);
+            pictureBox1.Image = res;
+            pictureBox1.Refresh();
+        }
+        private void âîëíàToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new WaveFilter();
+            Bitmap res = filter.processImage(image);
+            pictureBox1.Image = res;
+            pictureBox1.Refresh();
+        }
 
         private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
