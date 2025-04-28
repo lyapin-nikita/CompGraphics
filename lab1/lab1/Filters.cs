@@ -32,18 +32,35 @@ namespace lab1
         }
 
 
-        public Bitmap processImage(Bitmap sourceImage)
+        public Bitmap processImage(Bitmap sourceImage, BackgroundWorker worker)
         {
+
             Bitmap resultImage = new Bitmap(sourceImage.Width, sourceImage.Height);
 
             for (int i = 0; i < sourceImage.Width; i++)
             {
+                if (worker != null && worker.WorkerReportsProgress)
+                {
+                    int progress = (int)((float)i / sourceImage.Width * 100);
+                    worker.ReportProgress(progress);
+                }
+
+                if (worker != null && worker.CancellationPending)
+                {
+                    return null;
+                }
 
                 for (int j = 0; j < sourceImage.Height; j++)
                 {
                     resultImage.SetPixel(i, j, calculateNewPixel(sourceImage, i, j));
                 }
             }
+
+            if (worker != null && worker.WorkerReportsProgress)
+            {
+                worker.ReportProgress(100); // Завершение на 100%
+            }
+
             return resultImage;
         }
 
@@ -229,27 +246,27 @@ namespace lab1
 
 
 
-    class SobelFilter : MatrixFilter
+    class SobelOperator : MatrixFilter
     {
         protected float[,] kernelX = null;
         protected float[,] kernelY = null;
 
-        public SobelFilter()
+        public SobelOperator()
         {
             // Оператор Собеля по оси X
             kernelX = new float[,]
             {
-            { -1, 0, 1 },
-            { -2, 0, 2 },
-            { -1, 0, 1 }
+                { -1, 0, 1 },
+                { -2, 0, 2 },
+                { -1, 0, 1 }
             };
 
             // Оператор Собеля по оси Y
             kernelY = new float[,]
             {
-            { -1, -2, -1 },
-            {  0,  0,  0 },
-            {  1,  2,  1 }
+                { -1, -2, -1 },
+                {  0,  0,  0 },
+                {  1,  2,  1 }
             };
         }
 
@@ -298,6 +315,145 @@ namespace lab1
 
     }
 
+
+    class SharaOperator : MatrixFilter
+    {
+        protected float[,] kernelX = null;
+        protected float[,] kernelY = null;
+
+        public SharaOperator()
+        {
+            
+            kernelX = new float[,]
+            {
+                { 3, 0, -3 },
+                { 10, 0, -10 },
+                { 3, 0, -3 }
+            };
+
+            
+            kernelY = new float[,]
+            {
+                { -3, -10, -3 },
+                {  0,  0,  0 },
+                {  3,  10,  3 }
+            };
+        }
+
+        protected override Color calculateNewPixel(Bitmap source, int x, int y)
+        {
+            int radiusX = kernelX.GetLength(0) / 2;
+            int radiusY = kernelX.GetLength(1) / 2;
+
+            float resultRX = 0, resultGX = 0, resultBX = 0;
+            float resultRY = 0, resultGY = 0, resultBY = 0;
+
+            // Применяем оба оператора
+            for (int l = -radiusY; l <= radiusY; l++)
+            {
+                for (int k = -radiusX; k <= radiusX; k++)
+                {
+                    int idX = Clamp(x + k, 0, source.Width - 1);
+                    int idY = Clamp(y + l, 0, source.Height - 1);
+                    Color neighborColor = source.GetPixel(idX, idY);
+
+                    // Применяем оператор по X
+                    resultRX += neighborColor.R * kernelX[k + radiusX, l + radiusY];
+                    resultGX += neighborColor.G * kernelX[k + radiusX, l + radiusY];
+                    resultBX += neighborColor.B * kernelX[k + radiusX, l + radiusY];
+
+                    // Применяем оператор по Y
+                    resultRY += neighborColor.R * kernelY[k + radiusX, l + radiusY];
+                    resultGY += neighborColor.G * kernelY[k + radiusX, l + radiusY];
+                    resultBY += neighborColor.B * kernelY[k + radiusX, l + radiusY];
+                }
+            }
+
+            // Объединяем результаты (корень из суммы квадратов)
+            int resultR = (int)Math.Sqrt(resultRX * resultRX + resultRY * resultRY);
+            int resultG = (int)Math.Sqrt(resultGX * resultGX + resultGY * resultGY);
+            int resultB = (int)Math.Sqrt(resultBX * resultBX + resultBY * resultBY);
+
+            return Color.FromArgb(
+                Clamp(resultR, 0, 255),
+                Clamp(resultG, 0, 255),
+                Clamp(resultB, 0, 255)
+            );
+        }
+
+
+
+    }
+
+
+    class PruittOperator : MatrixFilter
+    {
+        protected float[,] kernelX = null;
+        protected float[,] kernelY = null;
+
+        public PruittOperator()
+        {
+
+            kernelX = new float[,]
+            {
+                { 1, 0, -1 },
+                { 1, 0, -1 },
+                { 1, 0, -1 }
+            };
+
+
+            kernelY = new float[,]
+            {
+                { -1, -1, -1 },
+                {  0,  0,  0 },
+                {  1,  1,  1 }
+            };
+        }
+
+        protected override Color calculateNewPixel(Bitmap source, int x, int y)
+        {
+            int radiusX = kernelX.GetLength(0) / 2;
+            int radiusY = kernelX.GetLength(1) / 2;
+
+            float resultRX = 0, resultGX = 0, resultBX = 0;
+            float resultRY = 0, resultGY = 0, resultBY = 0;
+
+            // Применяем оба оператора
+            for (int l = -radiusY; l <= radiusY; l++)
+            {
+                for (int k = -radiusX; k <= radiusX; k++)
+                {
+                    int idX = Clamp(x + k, 0, source.Width - 1);
+                    int idY = Clamp(y + l, 0, source.Height - 1);
+                    Color neighborColor = source.GetPixel(idX, idY);
+
+                    // Применяем оператор по X
+                    resultRX += neighborColor.R * kernelX[k + radiusX, l + radiusY];
+                    resultGX += neighborColor.G * kernelX[k + radiusX, l + radiusY];
+                    resultBX += neighborColor.B * kernelX[k + radiusX, l + radiusY];
+
+                    // Применяем оператор по Y
+                    resultRY += neighborColor.R * kernelY[k + radiusX, l + radiusY];
+                    resultGY += neighborColor.G * kernelY[k + radiusX, l + radiusY];
+                    resultBY += neighborColor.B * kernelY[k + radiusX, l + radiusY];
+                }
+            }
+
+            // Объединяем результаты (корень из суммы квадратов)
+            int resultR = (int)Math.Sqrt(resultRX * resultRX + resultRY * resultRY);
+            int resultG = (int)Math.Sqrt(resultGX * resultGX + resultGY * resultGY);
+            int resultB = (int)Math.Sqrt(resultBX * resultBX + resultBY * resultBY);
+
+            return Color.FromArgb(
+                Clamp(resultR, 0, 255),
+                Clamp(resultG, 0, 255),
+                Clamp(resultB, 0, 255)
+            );
+        }
+
+
+
+    }
 
     class SharpnessFilter : MatrixFilter
     {
@@ -427,38 +583,39 @@ namespace lab1
 
         //TODO реализовать медианный фильтр
         private MedianFilter medianFilter;
-        private SobelFilter sobelFilter;
+        private SobelOperator sobelFilter;
 
 
         public GlowingEdgesFilter()
         {
             medianFilter = new MedianFilter();
-            sobelFilter = new SobelFilter();
+            sobelFilter = new SobelOperator();
         }
 
 
 
         protected override Color calculateNewPixel(Bitmap source, int x, int y)
         {
-            //сначала применяем медианный фильтр и оператор собеля
-            Bitmap resMedian = medianFilter.processImage(source);
-            Bitmap resSobel = sobelFilter.processImage(resMedian);
-            Color edgeColor = resSobel.GetPixel(x, y);
+        //    //сначала применяем медианный фильтр и оператор собеля
+        //    Bitmap resMedian = medianFilter.processImage(source);
+        //    Bitmap resSobel = sobelFilter.processImage(resMedian);
+        //    Color edgeColor = resSobel.GetPixel(x, y);
 
 
-            int intensity = (int)(edgeColor.R + edgeColor.B + edgeColor.G);
-            int upIntensity = (int)(intensity * 2);
+        //    int intensity = (int)(edgeColor.R + edgeColor.B + edgeColor.G);
+        //    int upIntensity = (int)(intensity * 2);
 
 
-            Color resColor = Color.FromArgb
-                (
-                    Clamp(upIntensity, 0, 255),
-                    Clamp(upIntensity, 0, 255),
-                    Clamp(upIntensity, 0, 255)
+        //    Color resColor = Color.FromArgb
+        //        (
+        //            Clamp(upIntensity, 0, 255),
+        //            Clamp(upIntensity, 0, 255),
+        //            Clamp(upIntensity, 0, 255)
 
-                );
+        //        );
 
-            return resColor;
+        //    return resColor;
+        return Color.FromArgb(0,0,0);
 
         }
 
