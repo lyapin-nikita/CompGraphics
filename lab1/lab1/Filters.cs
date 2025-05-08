@@ -32,7 +32,7 @@ namespace lab1
         }
 
 
-        public Bitmap processImage(Bitmap sourceImage, BackgroundWorker worker)
+        public virtual Bitmap processImage(Bitmap sourceImage, BackgroundWorker worker)
         {
 
             Bitmap resultImage = new Bitmap(sourceImage.Width, sourceImage.Height);
@@ -66,8 +66,84 @@ namespace lab1
 
     }
 
+    class ImageDetails
+    {
+        Bitmap source;
+        public ImageDetails (Bitmap source)
+        {
+            this.source = source;
+        }
 
 
+        public int getMaxBrightness()
+        {
+            Color srsColor = source.GetPixel(0, 0);
+            int res = (srsColor.R + srsColor.B + srsColor.G) / 3;
+
+
+            for (int i = 0; i < source.Width; i++)
+            {
+                for (int j = 0; j < source.Height; j++)
+                {
+                    srsColor = source.GetPixel(i, j);
+                    int brightSource = (srsColor.R + srsColor.B + srsColor.G) / 3;
+                    if (brightSource > res) res = brightSource;
+                }
+            }
+            
+            return res;
+        }
+
+        public int getMinBrightness()
+        {
+            Color srsColor = source.GetPixel(0, 0);
+            int res = (srsColor.R + srsColor.B + srsColor.G) / 3;
+
+
+            for (int i = 0; i < source.Width; i++)
+            {
+                for (int j = 0; j < source.Height; j++)
+                {
+                    srsColor = source.GetPixel(i, j);
+                    int brightSource = (srsColor.R + srsColor.B + srsColor.G) / 3;
+                    if (brightSource < res) res = brightSource;
+                }
+            }
+
+            return res;
+        }
+    }
+
+
+    //класс для линейного растяжения
+    class LinearExcention : Filters
+    {
+        //y - brightness of pixel
+        int maxY = 255, minY = 0;
+
+        public LinearExcention(int maxY, int minY)
+        {
+            this.maxY = maxY;
+            this.minY = minY;
+        }
+        
+
+
+        protected override Color calculateNewPixel(Bitmap source, int x, int y)
+        {
+            Color sourceColor = source.GetPixel(x, y);
+            int Y = (sourceColor.R + sourceColor.G + sourceColor.B) / 3;
+            int newBrightness = (Y - minY) * (255 / (maxY - minY));
+            
+            int r = Clamp(sourceColor.R + newBrightness, 0, 255);
+            int g = Clamp(sourceColor.G + newBrightness, 0, 255);
+            int b = Clamp(sourceColor.B + newBrightness, 0, 255);
+
+            Color resColor = Color.FromArgb(r, g, b);
+            return resColor;
+            
+        }
+    }
 
 
     class InvertFilter : Filters
@@ -156,6 +232,7 @@ namespace lab1
 
 
     }
+
     class GrayScaleFilter : Filters
     {
 
@@ -580,45 +657,68 @@ namespace lab1
 
     class GlowingEdgesFilter : Filters
     {
-
-        //TODO реализовать медианный фильтр
         private MedianFilter medianFilter;
         private SobelOperator sobelFilter;
+        private int intensityMultiplier;
 
-
-        public GlowingEdgesFilter()
+        public GlowingEdgesFilter(int intensityMultiplier = 2)
         {
-            medianFilter = new MedianFilter();
-            sobelFilter = new SobelOperator();
+            this.medianFilter = new MedianFilter();
+            this.sobelFilter = new SobelOperator();
+            this.intensityMultiplier = intensityMultiplier;
         }
-
-
 
         protected override Color calculateNewPixel(Bitmap source, int x, int y)
         {
-        //    //сначала применяем медианный фильтр и оператор собеля
-        //    Bitmap resMedian = medianFilter.processImage(source);
-        //    Bitmap resSobel = sobelFilter.processImage(resMedian);
-        //    Color edgeColor = resSobel.GetPixel(x, y);
+            // Применяем медианный фильтр
+            Bitmap medianImage = medianFilter.processImage(source, null);
 
+            // Применяем оператор Собеля для выделения краев
+            Bitmap edgesImage = sobelFilter.processImage(medianImage, null);
+            Color edgeColor = edgesImage.GetPixel(x, y);
 
-        //    int intensity = (int)(edgeColor.R + edgeColor.B + edgeColor.G);
-        //    int upIntensity = (int)(intensity * 2);
+            // Усиливаем яркость краев
+            int intensity = (edgeColor.R + edgeColor.G + edgeColor.B) / 3;
+            int enhancedIntensity = Clamp(intensity * intensityMultiplier, 0, 255);
 
-
-        //    Color resColor = Color.FromArgb
-        //        (
-        //            Clamp(upIntensity, 0, 255),
-        //            Clamp(upIntensity, 0, 255),
-        //            Clamp(upIntensity, 0, 255)
-
-        //        );
-
-        //    return resColor;
-        return Color.FromArgb(0,0,0);
-
+            return Color.FromArgb(enhancedIntensity, enhancedIntensity, enhancedIntensity);
         }
 
+        public override Bitmap processImage(Bitmap sourceImage, BackgroundWorker worker)
+        {
+            // Переопределяем processImage для оптимальной обработки всего изображения
+            Bitmap medianImage = medianFilter.processImage(sourceImage, worker);
+            if (worker != null && worker.CancellationPending) return null;
+
+            Bitmap edgesImage = sobelFilter.processImage(medianImage, worker);
+            if (worker != null && worker.CancellationPending) return null;
+
+            Bitmap resultImage = new Bitmap(edgesImage.Width, edgesImage.Height);
+
+            for (int i = 0; i < edgesImage.Width; i++)
+            {
+                if (worker != null && worker.WorkerReportsProgress)
+                {
+                    int progress = (int)((float)i / edgesImage.Width * 100);
+                    worker.ReportProgress(progress);
+                }
+
+                if (worker != null && worker.CancellationPending)
+                {
+                    return null;
+                }
+
+                for (int j = 0; j < edgesImage.Height; j++)
+                {
+                    Color edgeColor = edgesImage.GetPixel(i, j);
+                    int intensity = (edgeColor.R + edgeColor.G + edgeColor.B) / 3;
+                    int enhancedIntensity = Clamp(intensity * intensityMultiplier, 0, 255);
+                    resultImage.SetPixel(i, j, Color.FromArgb(enhancedIntensity, enhancedIntensity, enhancedIntensity));
+                }
+            }
+
+            return resultImage;
+        }
     }
 
 
@@ -642,7 +742,7 @@ namespace lab1
 
             if (newX <= 0 || newX >= source.Width || newY <= 0 || newY >= source.Height)
             {
-                return Color.Gray;
+                return Color.White;
             }
 
 
@@ -688,7 +788,7 @@ namespace lab1
             // Проверяем границы изображения
             if (newX < 0 || newX >= source.Width || newY < 0 || newY >= source.Height)
             {
-                return Color.Gray;
+                return Color.White;
             }
 
             // Берем ближайший пиксель (без интерполяции)
@@ -789,5 +889,61 @@ namespace lab1
             return source.GetPixel(x, y);
         }
     }
+
+
+
+
+    class PerfectReflectorFilter : Filters
+    {
+        private float rMax = 0, gMax = 0, bMax = 0;
+        
+
+        protected override Color calculateNewPixel(Bitmap source, int x, int y)
+        {
+            CalculateMaxValues(source);
+
+            Color sourceColor = source.GetPixel(x, y);
+
+            // Масштабируем каналы
+            int r = (int)(sourceColor.R * (255f / rMax));
+            int g = (int)(sourceColor.G * (255f / gMax));
+            int b = (int)(sourceColor.B * (255f / bMax));
+
+            return Color.FromArgb(
+                Clamp(r, 0, 255),
+                Clamp(g, 0, 255),
+                Clamp(b, 0, 255));
+        }
+
+        private void CalculateMaxValues(Bitmap source)
+        {
+            // Находим максимальные значения по каждому каналу
+            for (int y = 0; y < source.Height; y++)
+            {
+                for (int x = 0; x < source.Width; x++)
+                {
+                    Color pixel = source.GetPixel(x, y);
+                    if (pixel.R > rMax) rMax = pixel.R;
+                    if (pixel.G > gMax) gMax = pixel.G;
+                    if (pixel.B > bMax) bMax = pixel.B;
+                }
+            }
+
+            // Гарантируем, что не будет деления на ноль
+            if (rMax == 0) rMax = 1;
+            if (gMax == 0) gMax = 1;
+            if (bMax == 0) bMax = 1;
+        }
+
+        
+    }
+
+
+
+
+
+
+
+
 
 }

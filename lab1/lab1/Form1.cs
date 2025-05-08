@@ -125,6 +125,10 @@ namespace lab1
         {
 
         }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            backgroundWorker1.CancelAsync();
+        }
 
         private void button2_Click(object sender, EventArgs e)
         {
@@ -150,7 +154,7 @@ namespace lab1
             }
 
 
-               
+
         }
 
 
@@ -285,7 +289,7 @@ namespace lab1
             //Bitmap res = filter.processImage(image);
             //pictureBox1.Image = res;
             //pictureBox1.Refresh();
-
+            
             Filters filter = new GlowingEdgesFilter();
             backgroundWorker1.RunWorkerAsync(filter);
         }
@@ -354,6 +358,21 @@ namespace lab1
             backgroundWorker1.RunWorkerAsync(filter);
         }
 
+        private void ëèíåéíîåĞàñòÿæåíèåToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ImageDetails imageInfo = new ImageDetails(image);
+            int max = imageInfo.getMaxBrightness();
+            int min = imageInfo.getMinBrightness();
+            Filters filter = new LinearExcention(max, min);
+            backgroundWorker1.RunWorkerAsync(filter);
+        }
+
+        private void èäåàëüíûéÎòğàæàòåëüToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new PerfectReflectorFilter();
+            backgroundWorker1.RunWorkerAsync(filter);
+        }
+
         private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
 
@@ -410,8 +429,6 @@ namespace lab1
             progressBar1.Value = 0;
         }
 
-        
+
     }
-
-
 }
