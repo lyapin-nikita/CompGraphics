@@ -289,7 +289,7 @@ namespace lab1
             //Bitmap res = filter.processImage(image);
             //pictureBox1.Image = res;
             //pictureBox1.Refresh();
-            
+
             Filters filter = new GlowingEdgesFilter();
             backgroundWorker1.RunWorkerAsync(filter);
         }
@@ -354,9 +354,16 @@ namespace lab1
             //pictureBox1.Image = res;
             //pictureBox1.Refresh();
 
-            Filters filter = new WaveFilter();
+            Filters filter = new WaveFilterVertical();
             backgroundWorker1.RunWorkerAsync(filter);
         }
+        private void âîëíàãîğèçîíòàëüíàÿToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new WaveFilterHorizontal();
+            backgroundWorker1.RunWorkerAsync(filter);
+        }
+
+
 
         private void ëèíåéíîåĞàñòÿæåíèåToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -430,5 +437,35 @@ namespace lab1
         }
 
 
+
+        private void ñóæåíèåToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new ErosionFilter();
+            backgroundWorker1.RunWorkerAsync(filter);
+        }
+
+        private void ğàñøèğåíèåToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new DilationFilter();
+            backgroundWorker1.RunWorkerAsync(filter);
+        }
+
+        private void îòêğûòèåToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new OpeningFilter();
+            backgroundWorker1.RunWorkerAsync(filter);
+        }
+
+        private void çàêğûòèåToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new ClosingFilter();
+            backgroundWorker1.RunWorkerAsync(filter);
+        }
+
+        private void topHatToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Filters filter = new TopHatFilter();
+            backgroundWorker1.RunWorkerAsync(filter);
+        }
     }
 }

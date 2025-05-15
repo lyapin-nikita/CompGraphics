@@ -850,18 +850,15 @@ namespace lab1
 
 
 
-    class WaveFilter : Filters
+    class WaveFilterVertical : Filters
     {
-        public enum WaveType { Vertical, Horizontal }
-        private WaveType type;
+        
         private double amplitude;
         private double period;
 
-        public WaveFilter(WaveType type = WaveType.Vertical,
-                         double amplitude = 20,
-                         double period = 60)
+        public WaveFilterVertical(double amplitude = 20, double period = 60)
         {
-            this.type = type;
+            
             this.amplitude = amplitude;
             this.period = period;
         }
@@ -871,23 +868,59 @@ namespace lab1
             double newX = k;
             double newY = l;
 
-            // Применяем соответствующее волновое преобразование
-            switch (type)
-            {
-                case WaveType.Vertical:
+            
+            
+                
                     newX = k + amplitude * Math.Sin(2 * Math.PI * l / period);
-                    break;
-                case WaveType.Horizontal:
-                    newY = l + amplitude * Math.Sin(2 * Math.PI * k / (period / 2));
-                    break;
-            }
+                    
+                //case WaveType.Horizontal:
+                //    newY = l + amplitude * Math.Sin(2 * Math.PI * k / (period / 2));
+                //    break;
+            
 
-            // Ограничиваем координаты размерами изображения
+            
             int x = Clamp((int)newX, 0, source.Width - 1);
             int y = Clamp((int)newY, 0, source.Height - 1);
 
             return source.GetPixel(x, y);
         }
+    }
+
+
+    class WaveFilterHorizontal : Filters
+    {
+        private double amplitude;
+        private double period;
+
+        public WaveFilterHorizontal(double amplitude = 20, double period = 60)
+        {
+
+            this.amplitude = amplitude;
+            this.period = period;
+        }
+
+        protected override Color calculateNewPixel(Bitmap source, int k, int l)
+        {
+            double newX = k;
+            double newY = l;
+
+
+
+
+
+
+
+            newY = l + amplitude * Math.Sin(2 * Math.PI * k / (period / 2));
+
+
+
+
+            int x = Clamp((int)newX, 0, source.Width - 1);
+            int y = Clamp((int)newY, 0, source.Height - 1);
+
+            return source.GetPixel(x, y);
+        }
+
     }
 
 
@@ -941,9 +974,244 @@ namespace lab1
 
 
 
+    abstract class MorphologicalFilters : Filters
+    {
+        protected bool[,] mask;
+
+
+        public MorphologicalFilters() 
+        {
+            //маска 
+            mask = new bool[3, 3]
+                {
+                    {true, true, true },
+                    { true, true, true },
+                    { true, true, true }
+                };
+        }
+        
+
+    }
+
+
+    class ErosionFilter : MorphologicalFilters
+    {
+        protected override Color calculateNewPixel(Bitmap source, int x, int y)
+        {
+            int minR = 255, minG = 255, minB = 255;
+            int maskWidth = mask.GetLength(0);
+            int maskHeight = mask.GetLength(1);
+
+            // Центр маски
+            int centerX = maskWidth / 2;
+            int centerY = maskHeight / 2;
+
+            // Перебираем все элементы маски
+            for (int i = 0; i < maskWidth; i++)
+            {
+                for (int j = 0; j < maskHeight; j++)
+                {
+                    // Если элемент маски активен
+                    if (mask[i, j])
+                    {
+                        // Смещение относительно центра
+                        int offsetX = i - centerX;
+                        int offsetY = j - centerY;
+
+                        // Координаты в исходном изображении
+                        int srcX = x + offsetX;
+                        int srcY = y + offsetY;
+
+                        // Проверяем границы изображения
+                        if (srcX >= 0 && srcX < source.Width &&
+                            srcY >= 0 && srcY < source.Height)
+                        {
+                            Color pixel = source.GetPixel(srcX, srcY);
+                            minR = Math.Min(minR, pixel.R);
+                            minG = Math.Min(minG, pixel.G);
+                            minB = Math.Min(minB, pixel.B);
+                        }
+                    }
+                }
+            }
+
+            return Color.FromArgb(minR, minG, minB);
+        }
+
+    }
+
+
+    class DilationFilter : MorphologicalFilters
+    {
+        protected override Color calculateNewPixel(Bitmap source, int x, int y)
+        {
+            int maxR = 0, maxG = 0, maxB = 0;
+            int maskWidth = mask.GetLength(0);
+            int maskHeight = mask.GetLength(1);
+
+            // Центр маски
+            int centerX = maskWidth / 2;
+            int centerY = maskHeight / 2;
+
+            // Перебираем все элементы маски
+            for (int i = 0; i < maskWidth; i++)
+            {
+                for (int j = 0; j < maskHeight; j++)
+                {
+                    // Если элемент маски активен
+                    if (mask[i, j])
+                    {
+                        // Смещение относительно центра
+                        int offsetX = i - centerX;
+                        int offsetY = j - centerY;
+
+                        // Координаты в исходном изображении
+                        int srcX = x + offsetX;
+                        int srcY = y + offsetY;
+
+                        // Проверяем границы изображения
+                        if (srcX >= 0 && srcX < source.Width &&
+                            srcY >= 0 && srcY < source.Height)
+                        {
+                            Color pixel = source.GetPixel(srcX, srcY);
+                            maxR = Math.Max(maxR, pixel.R);
+                            maxG = Math.Max(maxG, pixel.G);
+                            maxB = Math.Max(maxB, pixel.B);
+                        }
+                    }
+                }
+            }
+
+            return Color.FromArgb(maxR, maxG, maxB);
+        }
+    }
+
+
+    class OpeningFilter : Filters
+    {
+        private bool[,] mask;
+
+        public OpeningFilter()
+        {
+            // Маска по умолчанию (крест 3x3)
+            mask = new bool[3, 3] {
+                { false, true, false },
+                { true, true, true },
+                { false, true, false }
+            };
+        }
+
+        
+
+        protected override Color calculateNewPixel(Bitmap source, int x, int y)
+        {
+            // Для opening не используется напрямую, так как это составная операция
+            return Color.Black;
+        }
+
+        public override Bitmap processImage(Bitmap sourceImage, BackgroundWorker worker)
+        {
+            // 1. Применяем эрозию
+            ErosionFilter erosion = new ErosionFilter();
+            Bitmap eroded = erosion.processImage(sourceImage, worker);
+
+            if (worker != null && worker.CancellationPending)
+                return null;
+
+            // 2. Применяем дилатацию к результату эрозии
+            DilationFilter dilation = new DilationFilter();
+            return dilation.processImage(eroded, worker);
+        }
+    }
+
+    // Класс для морфологического закрытия (closing = dilation -> erosion)
+    class ClosingFilter : Filters
+    {
+        private bool[,] mask;
+
+        public ClosingFilter()
+        {
+            // Маска по умолчанию (крест 3x3)
+            mask = new bool[3, 3] {
+                { false, true, false },
+                { true, true, true },
+                { false, true, false }
+            };
+        }
+
+        
+
+        protected override Color calculateNewPixel(Bitmap source, int x, int y)
+        {
+            // Для closing не используется напрямую, так как это составная операция
+            return Color.Black;
+        }
+
+        public override Bitmap processImage(Bitmap sourceImage, BackgroundWorker worker)
+        {
+            // 1. Применяем дилатацию
+            DilationFilter dilation = new DilationFilter();
+            Bitmap dilated = dilation.processImage(sourceImage, worker);
+
+            if (worker != null && worker.CancellationPending)
+                return null;
+
+            // 2. Применяем эрозию к результату дилатации
+            ErosionFilter erosion = new ErosionFilter();
+            return erosion.processImage(dilated, worker);
+        }
+    }
 
 
 
 
+    //вычитание из исх изображения его открытие
+    class TopHatFilter : Filters
+    {
+        private bool[,] mask; 
+        private Bitmap openedImage; 
+
+        public TopHatFilter()
+        {
+            
+            this.mask = new bool[3, 3]
+            {
+                { true, true, true },
+                { true, true, true },
+                { true, true, true }
+            };
+
+            
+        }
+
+        //вычисление сужения и расширения
+        private Bitmap ComputeOpening(Bitmap sourceImage)
+        {
+            ErosionFilter erosion = new ErosionFilter();
+            DilationFilter dilation = new DilationFilter();
+            Bitmap eroded = erosion.processImage(sourceImage, null);
+            return dilation.processImage(eroded, null);
+        }
+
+        protected override Color calculateNewPixel(Bitmap source, int x, int y)
+        {
+            
+            
+            openedImage = ComputeOpening(source);
+            
+
+            Color srcColor = source.GetPixel(x, y);
+            Color openedColor = openedImage.GetPixel(x, y);
+
+            //top Hat = исходное - открытие
+            int r = Clamp(srcColor.R - openedColor.R, 0, 255);
+            int g = Clamp(srcColor.G - openedColor.G, 0, 255);
+            int b = Clamp(srcColor.B - openedColor.B, 0, 255);
+
+
+
+            return Color.FromArgb(r, g, b);
+        }
+    }
 
 }

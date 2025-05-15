@@ -3,16 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\nikitoschillguy2004\\Documents\\GitHub\\CompGraphics\\lab1\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{0ECDBD32-2F46-4FB1-B93E-2003FF441149}|lab1\\lab1.csproj|c:\\users\\nikitoschillguy2004\\documents\\github\\compgraphics\\lab1\\lab1\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0ECDBD32-2F46-4FB1-B93E-2003FF441149}|lab1\\lab1.csproj|solutionrelative:lab1\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{0ECDBD32-2F46-4FB1-B93E-2003FF441149}|lab1\\lab1.csproj|c:\\users\\nikitoschillguy2004\\documents\\github\\compgraphics\\lab1\\lab1\\filters.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0ECDBD32-2F46-4FB1-B93E-2003FF441149}|lab1\\lab1.csproj|solutionrelative:lab1\\filters.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{0ECDBD32-2F46-4FB1-B93E-2003FF441149}|lab1\\lab1.csproj|C:\\Users\\nikitoschillguy2004\\Documents\\GitHub\\CompGraphics\\lab1\\lab1\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{0ECDBD32-2F46-4FB1-B93E-2003FF441149}|lab1\\lab1.csproj|solutionrelative:lab1\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0ECDBD32-2F46-4FB1-B93E-2003FF441149}|lab1\\lab1.csproj|c:\\users\\nikitoschillguy2004\\documents\\github\\compgraphics\\lab1\\lab1\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0ECDBD32-2F46-4FB1-B93E-2003FF441149}|lab1\\lab1.csproj|solutionrelative:lab1\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,16 +22,16 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Form1.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
               "DocumentMoniker": "C:\\Users\\nikitoschillguy2004\\Documents\\GitHub\\CompGraphics\\lab1\\lab1\\Form1.cs",
               "RelativeDocumentMoniker": "lab1\\Form1.cs",
-              "ToolTip": "C:\\Users\\nikitoschillguy2004\\Documents\\GitHub\\CompGraphics\\lab1\\lab1\\Form1.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]*",
-              "RelativeToolTip": "lab1\\Form1.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]*",
+              "ToolTip": "C:\\Users\\nikitoschillguy2004\\Documents\\GitHub\\CompGraphics\\lab1\\lab1\\Form1.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
+              "RelativeToolTip": "lab1\\Form1.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-04-26T10:59:55.78Z",
               "IsPinned": true,
@@ -39,26 +39,26 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Filters.cs",
               "DocumentMoniker": "C:\\Users\\nikitoschillguy2004\\Documents\\GitHub\\CompGraphics\\lab1\\lab1\\Filters.cs",
               "RelativeDocumentMoniker": "lab1\\Filters.cs",
               "ToolTip": "C:\\Users\\nikitoschillguy2004\\Documents\\GitHub\\CompGraphics\\lab1\\lab1\\Filters.cs",
               "RelativeToolTip": "lab1\\Filters.cs",
-              "ViewState": "AgIAAGsCAAAAAAAAAAAtwMACAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAANgDAAAAAAAAAAAAAPYDAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-04-17T20:05:02.137Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "Form1.cs",
               "DocumentMoniker": "C:\\Users\\nikitoschillguy2004\\Documents\\GitHub\\CompGraphics\\lab1\\lab1\\Form1.cs",
               "RelativeDocumentMoniker": "lab1\\Form1.cs",
-              "ToolTip": "C:\\Users\\nikitoschillguy2004\\Documents\\GitHub\\CompGraphics\\lab1\\lab1\\Form1.cs*",
-              "RelativeToolTip": "lab1\\Form1.cs*",
-              "ViewState": "AgIAAA4BAAAAAAAAAAAtwCIBAAAkAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\nikitoschillguy2004\\Documents\\GitHub\\CompGraphics\\lab1\\lab1\\Form1.cs",
+              "RelativeToolTip": "lab1\\Form1.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAgwKMBAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-04-17T20:07:02.278Z",
               "EditorCaption": ""
